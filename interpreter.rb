@@ -1,8 +1,10 @@
+require('./environment')
+
 class Interpreter
   def interpret(x, env = $global_env)
     case x
     when Symbol
-      env.find_variable(x)[x]
+      env.find(x)[x]
     when Array
       case x.first
       when :quote
@@ -14,7 +16,7 @@ class Interpreter
         interpret(result, env)
       when :set!
         _, var, exp = x
-        env.find_variable(var)[var] = interpret(exp, var)
+        env.find(var)[var] = interpret(exp, var)
       when :define
         _, var, exp = x
         env[var] = interpret(exp, env)
@@ -25,9 +27,11 @@ class Interpreter
       when :begin
         x[1..-1].inject(nil) { |val, exp| val = interpret(exp, env) }
       else
-        proc, *exps = x.inject([]) { |mem, exp| mem << evaluate(exp, env) }
-        proc.call(*exps)
+        proc, *exps = x.inject([]) { |mem, exp| mem << interpret(exp, env) }
+        proc[*exps]
       end
+    else
+      x
     end
   end
 end
