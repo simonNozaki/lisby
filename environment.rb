@@ -1,3 +1,5 @@
+require('set')
+
 class Environment < Hash
   # @param [Environment] outer
   def initialize(params = [], args = [], outer = nil)
@@ -39,15 +41,37 @@ $global_env = Environment.new do
     :cons => -> x,y {[x, y]},
     :first => -> x {x[0]},
     :last => -> x { x[x.length - 1] },
-    :list => -> *x {[*x]},
-    :list? => -> x {x.instance_of?(Array)},
-    :symbol? => -> x {x.instance_of?(Symbol)},
-    :integer? => -> x { x.instance_of?(Integer) },
     :conj => -> x,y do
       # 一度シリアライズして別のオブジェクトにすることで全く別のオブジェクトにできる
       a = Marshal.load(Marshal.dump(x))
       a.push(y)
       a
     end,
+    :conj! => -> x, y { x.push(y) },
+    :disj => -> x, y do
+      a = Marshal.load(Marshal.dump(x))
+      a.delete(y)
+      a
+    end,
+    :disj! => -> x, y { x.delete(y) },
+    :get => -> x, y { x[y] },
+    :repeat => -> x, y do
+      a = []
+      x.times do
+        a.push(y)
+      end
+      a
+    end,
+    :inc => -> x { x + 1 },
+    :list => -> *x { [*x] },
+    :range => -> x, y do
+      a = y.nil? ? 1..x : x..y
+      a.to_a
+    end,
+    :list? => -> x {x.instance_of?(Array)},
+    :set => -> *x { Set[*x] },
+    :set? => -> x { x.instance_of?(Set) },
+    :symbol? => -> x {x.instance_of?(Symbol)},
+    :integer? => -> x { x.instance_of?(Integer) },
   }
 end
