@@ -10,11 +10,6 @@ class Repl
     @interpreter = Interpreter.new
   end
 
-  # Print a result of REPL process
-  def print(expression)
-    p expression.instance_of?(Array) ? "[#{expression.map(&:to_s).join(' ')}]" : expression
-  end
-
   # Start REPL process
   def execute
     loop do
@@ -27,7 +22,7 @@ class Repl
         end
         symbols = @parser.parse(line)
         result = @interpreter.interpret(symbols, $global_env)
-        print(result) unless result.nil?
+        p(result) unless result.nil?
       rescue SyntaxError, ArgumentError, NoMethodError => e
         e.backtrace
         retry

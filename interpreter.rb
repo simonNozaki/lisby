@@ -19,7 +19,7 @@ class Interpreter
       when :set!
         _, var, exp = x
         env.find(var)[var] = interpret(exp, var)
-      when :def
+      when :define
         _, var, exp = x
         env[var] = interpret(exp, env)
         var
@@ -29,10 +29,7 @@ class Interpreter
       when :begin
         x[1..-1].inject(nil) { |val, exp| val = interpret(exp, env) }
       else
-        p x
         proc, *exps = x.inject([]) { |mem, exp| mem << interpret(exp, env) }
-        p proc
-        p *exps.to_a
         proc[*exps]
       end
     else
