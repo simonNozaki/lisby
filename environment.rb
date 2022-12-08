@@ -29,11 +29,18 @@ $global_env = Environment.new do
     :< => -> x,y{x<y},
     :<= => -> x,y{x<=y},
     :'=' => -> x,y{x==y},
+    :and => -> x,y { x and y },
+    :or => -> x,y { x or y },
     :eq? => -> x,y {x.eql?(y)},
     :length => -> x {x.length},
     :display => -> *x { p(*x) },
     :odd? => -> x { x % 2 != 0 },
     :even? => -> x { x % 2 == 0 },
+    :negative? => -> x { x < 0 },
+    :'nat-int?' => -> x { x.instance_of?(Integer) and x > 0 },
+    :abs => -> x { x.abs },
+    :float => -> x { x.to_f }, # coerce to float
+    :int => -> x { x.to_i }, # coerce to integer
     :rand => -> x do
       return rand if x.nil?
       rand(x)
@@ -62,8 +69,16 @@ $global_env = Environment.new do
       end
       a
     end,
+    # x: lambda, y: a list lambda applied
+    :some => -> x, y { !y.filter(&x).empty? },
+    :filter => -> x, y { y.filter(&x) },
+    :map => -> x, y { y.map(&x) },
+    :every? => -> x, y { y.all?(&x) },
+    :empty? => -> x { x.empty? },
     :inc => -> x { x + 1 },
     :list => -> *x { [*x] },
+    :max => -> *x { [*x].max },
+    :min => -> *x { [*x].min },
     :range => -> x, y do
       a = y.nil? ? 1..x : x..y
       a.to_a

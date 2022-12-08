@@ -22,7 +22,7 @@ class Repl
         end
         symbols = @parser.parse(line)
         result = @interpreter.interpret(symbols, $global_env)
-        p(result) unless result.nil?
+        p(result)
       rescue SyntaxError, ArgumentError, NoMethodError => e
         e.backtrace
         retry
