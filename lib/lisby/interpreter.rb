@@ -1,5 +1,6 @@
-require('./environment')
+require('lisby/environment')
 
+module Lisby
 class Interpreter
   def interpret(x, env = $global_env)
     case x
@@ -37,13 +38,14 @@ class Interpreter
       when :let
         _, var_pairs, expression = x
         if var_pairs.first.instance_of?(Symbol)
-          env[var_pairs.first] = interpret(var_pairs[1], env)
+          e = Environment.new([var_pairs.first], [var_pairs[1]], env)
+          interpret(expression, e)
         else
-          var_pairs.each do |pair|
-            env[pair.first] = interpret(var_pairs[1], env)
-          end
+          keys = var_pairs.map(&:first)
+          values = var_pairs.map { |pair| pair[1] }
+          e = Environment.new(keys, values, env)
+          interpret(expression, e)
         end
-        interpret(expression, env)
       else
         proc, *exps = x.inject([]) { |mem, exp| mem << interpret(exp, env) }
         proc[*exps]
@@ -62,4 +64,5 @@ class Interpreter
       }
       bool[symbol]
     end
+end
 end

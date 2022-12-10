@@ -1,9 +1,10 @@
-require('./kernel')
-require('./environment')
-require('./interpreter')
-require('./parser')
+require('lisby/kernel')
+require('lisby/environment')
+require('lisby/interpreter')
+require('lisby/parser')
 require('readline')
 
+module Lisby
 class Repl
   def initialize
     @parser = Parser.new
@@ -32,3 +33,4 @@ class Repl
 end
 
 Repl.new.execute
+end

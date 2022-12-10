@@ -1,27 +1,28 @@
 require('set')
 
-class Environment < Hash
-  # @param [Environment] outer
-  def initialize(params = [], args = [], outer = nil)
-    h = Hash[params.zip(args)]
-    merge!(h)
-    merge!(yield) if block_given?
-    @outer = outer
-  end
+module Lisby
+  class Environment < Hash
+    # @param [Environment] outer
+    def initialize(params = [], args = [], outer = nil)
+      h = Hash[params.zip(args)]
+      merge!(h)
+      merge!(yield) if block_given?
+      @outer = outer
+    end
 
-  # @return [Environment] var
-  def find(var)
-    self.has_key?(var) ? self : @outer.find(var)
+    # @return [Environment] var
+    def find(var)
+      self.has_key?(var) ? self : @outer.find(var)
+    end
   end
-end
 
 # builtin functions
 $global_env = Environment.new do
   {
-    :+ => ->x,y{x+y},
-    :- => ->x,y{x-y},
-    :* => ->x,y{x*y},
-    :/ => ->x,y{x/y},
+    :+ => -> *x { [*x].sum },
+    :- => -> *x { [*x].inject(&:-) },
+    :* => -> *x { [*x].inject(&:*) },
+    :/ => -> *x { [*x].inject(&:/) },
     :% => -> x,y { x % y },
     :not => ->x{!x},
     :> => -> x,y{x>y},
@@ -89,4 +90,5 @@ $global_env = Environment.new do
     :symbol? => -> x {x.instance_of?(Symbol)},
     :integer? => -> x { x.instance_of?(Integer) },
   }
+end
 end
